@@ -58,7 +58,7 @@ export class TokenPriceController {
 
             if (contract === altContract && altValues.hasOwnProperty(symbol)) {
                 const tokenPrice: IPrice = pricesMap[token.symbol.toLowerCase()];
-                const price = tokenPrice["price_" + currencyLowerCase]
+                const price = tokenPrice["quotes"][currency]["price"].toString();
                 return {
                     id: tokenPrice.id,
                     name: tokenPrice.name,
