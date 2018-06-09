@@ -36,9 +36,9 @@ export class TokenPriceController {
 
     private filterTokenPrices(prices: any[], tokens: IToken[], currency: string): any {
         const altContract = "0x0000000000000000000000000000000000000000"; // ETH, EHC, POA, CLO
-        const pricesCoinmarket = prices[0];
+        const pricesCoinmarket = (<any>Object).values(prices[0]['data']);
         const pricesMap: IPrice[] = pricesCoinmarket.reduce((map: any, obj: any) => {
-            map[obj.id] = obj;
+            map[obj.symbol.toLowerCase()] = obj;
             return map;
         }, {});
 
@@ -46,7 +46,8 @@ export class TokenPriceController {
             "ETH": "ethereum",
             "ETC": "ethereum-classic",
             "POA": "poa-network",
-            "CLO": "callisto-network"
+            "CLO": "callisto-network",
+            "ELLA": "ellaism"
         }
 
         const result1 = tokens.map((token: IToken) => {
@@ -56,8 +57,7 @@ export class TokenPriceController {
             const currencyLowerCase = currency.toLowerCase()
 
             if (contract === altContract && altValues.hasOwnProperty(symbol)) {
-                const id = altValues[token.symbol];
-                const tokenPrice: IPrice = pricesMap[id];
+                const tokenPrice: IPrice = pricesMap[token.symbol.toLowerCase()];
                 const price = tokenPrice["price_" + currencyLowerCase]
                 return {
                     id: tokenPrice.id,
