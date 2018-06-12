@@ -16,7 +16,7 @@ export class Notification {
     private settings = {
         apn: {
             token: {
-                key: Buffer.from(config.get("PUSHER.APN.KEY"), "base64").toString(),
+   	        key: config.get("PUSHER.APN.KEY"), //Buffer.from(config.get("PUSHER.APN.KEY"), "base64").toString(),
                 keyId: config.get("PUSHER.APN.KEYID"),
                 teamId: config.get("PUSHER.APN.TEAMID"),
             },
