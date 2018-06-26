@@ -4,6 +4,7 @@ import { TokenController } from "../controllers/TokenController";
 import { StatusController } from "../controllers/StatusController";
 import { Pusher } from "../controllers/PusherController";
 import { PriceController } from "../controllers/PriceController";
+import { EllaismPriceController } from "../controllers/EllaismPriceController";
 import { TokenPriceController } from "../controllers/TokenPriceController";
 import { AssetsController } from "../controllers/AssestsController";
 
@@ -14,6 +15,7 @@ const tokenController = new TokenController();
 const statusController = new StatusController();
 const pusherController = new Pusher();
 const priceController = new PriceController();
+const ellaismPriceController = new EllaismPriceController();
 const tokenPriceController = new TokenPriceController();
 const assetsController = new AssetsController();
 
@@ -39,6 +41,8 @@ router.post("/tokenPrices", tokenPriceController.getTokenPrices);
 // URLs for assets
 router.get("/assets", assetsController.getAssets);
 
+router.get("/returnChartData", ellaismPriceController.getHistoricalPrices);
+router.get("/currentPrice", ellaismPriceController.getCurrentPrice);
 
 export {
     router
