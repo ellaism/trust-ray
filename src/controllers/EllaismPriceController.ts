@@ -4,6 +4,7 @@ import axios from "axios";
 import {Promise} from "bluebird";
 import {HistoricalPrice} from "../models/HistoricalPriceModel";
 import {CurrentPrice} from "../models/CurrentPriceModel";
+import { Config } from "../common/Config";
 
 const Transaction = require('mongoose-transactions');
 
@@ -52,6 +53,29 @@ export class EllaismPriceController {
                     });
                 });
             }
+        });
+    };
+
+    accountBalanceMulti = (req: Request, res: Response) => {
+        const address_param = req.query.address;
+        const addresses = address_param.split(',');
+
+        var balances = [];
+        addresses.forEach( address => {
+            balances.push(Config.web3.eth.getBalance(address));
+        });
+
+        var results = [];
+        Promise.all(balances).then( balance_results => {
+            balance_results.forEach( (r, i) => {
+                results.push({"account": addresses[i], "balance": r });
+            });
+
+            sendJSONresponse(res, 200, {
+                status: "1",
+                message: "OK",
+                result: results
+            });
         });
     };
 
