@@ -56,6 +56,25 @@ export class EllaismPriceController {
         });
     };
 
+    estimateGas = (req: Request, res: Response) => {
+        const to_param = req.query.to;
+        const value = req.query.value;
+        const gasPrice = req.query.gasPrice;
+        const gas = req.query.gas;
+        Config.web3.eth.estimateGas({
+            'to': to_param,
+            value: value,
+            gasPrice: gasPrice,
+            gas: gas
+        }).then(result => {
+            sendJSONresponse(res, 200, {
+                status: "1",
+                message: "OK",
+                result: result
+            });
+        });
+    };
+
     accountBalanceMulti = (req: Request, res: Response) => {
         const address_param = req.query.address;
         const addresses = address_param.split(',');
