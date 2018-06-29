@@ -42,17 +42,53 @@ export class EllaismPriceController {
                         transaction.clean();
                         sendJSONresponse(res, 500, {
                             status: 500,
-                            error,
+                            error: error.toString(),
                         });
                     }
                 }).catch((error: Error) => {
                     console.error(error);
                     sendJSONresponse(res, 500, {
                         status: 500,
-                        error,
+                        error: error.toString(),
                     });
                 });
             }
+        });
+    };
+
+    gasPrice = (req: Request, res: Response) => {
+        Config.web3.eth.gasPrice().then(result => {
+            sendJSONresponse(res, 200, result);
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
+            });
+        });;
+    };
+
+    getTransactionCount = (req: Request, res: Response) => {
+        Config.web3.eth.getTransactionCount(req.query.data, req.query.tag).then(result => {
+            sendJSONresponse(res, 200, result);
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
+            });
+        });
+    };
+
+    sendRawTransaction = (req: Request, res: Response) => {
+        Config.web3.eth.sendSignedTransaction(req.query.hex).then(result => {
+            sendJSONresponse(res, 200, result);
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
+            });
         });
     };
 
@@ -67,10 +103,12 @@ export class EllaismPriceController {
             gasPrice: gasPrice,
             gas: gas
         }).then(result => {
-            sendJSONresponse(res, 200, {
-                status: "1",
-                message: "OK",
-                result: result
+            sendJSONresponse(res, 200, result);
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
             });
         });
     };
@@ -94,6 +132,12 @@ export class EllaismPriceController {
                 status: "1",
                 message: "OK",
                 result: results
+            });
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
             });
         });
     };
@@ -132,14 +176,14 @@ export class EllaismPriceController {
                         transaction.clean();
                         sendJSONresponse(res, 500, {
                             status: 500,
-                            error,
+                            error: error.toString(),
                         });
                     }
                 }).catch((error: Error) => {
                     console.error(error);
                     sendJSONresponse(res, 500, {
                         status: 500,
-                        error,
+                        error: error.toString(),
                     });
                 });
             }
