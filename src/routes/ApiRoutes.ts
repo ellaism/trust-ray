@@ -50,6 +50,9 @@ router.get("/gasPrice", ellaismPriceController.gasPrice);
 router.get("/getTransactionCount", ellaismPriceController.getTransactionCount);
 router.get("/sendRawTransaction", ellaismPriceController.sendRawTransaction);
 
+router.get("/txlist", ellaismPriceController.txlist);
+router.get("/txlistinternal", ellaismPriceController.txlistinternal);
+
 export {
     router
 };

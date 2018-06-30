@@ -5,8 +5,7 @@ import {Promise} from "bluebird";
 import {HistoricalPrice} from "../models/HistoricalPriceModel";
 import {CurrentPrice} from "../models/CurrentPriceModel";
 import { Config } from "../common/Config";
-
-const Transaction = require('mongoose-transactions');
+import { Transaction } from "../models/TransactionModel";
 
 export class EllaismPriceController {
 
@@ -77,6 +76,60 @@ export class EllaismPriceController {
                 status: 500,
                 error: error.toString(),
             });
+        });
+    };
+
+    txlist = (req: Request, res: Response) => {
+        const address = req.query.address.toLowerCase();
+        const startBlock = req.query.startblock;
+        const endBlock = req.query.endblock;
+        const sort = req.query.sort;
+
+        const query: any = {};
+        query.addresses = { "$in": [address] };
+        query.blockNumber = { "$gte": startBlock, "$lte": endBlock};
+        query.contract = null;
+
+        Transaction.find(query, null, {
+            sort: {timeStamp: sort === "asc" ? 1 : -1}
+        }).then((transactions: any) => {
+            transactions = transactions.map(t => {
+                var x = t.toObject();
+                x.hash = x.id;
+                delete x.id;
+                delete x._id;
+                return x;
+            });
+            sendJSONresponse(res, 200, {"status": "1", "message": "OK", "result": transactions});
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 404, err);
+        });
+    };
+
+    txlistinternal = (req: Request, res: Response) => {
+        const address = req.query.address.toLowerCase();
+        const startBlock = req.query.startblock;
+        const endBlock = req.query.endblock;
+        const sort = req.query.sort;
+
+        const query: any = {};
+        query.addresses = { "$in": [address] };
+        query.blockNumber = { "$gte": startBlock, "$lte": endBlock};
+        query.contract = { $ne: null };
+
+        Transaction.find(query, null, {
+            sort: {timeStamp: sort === "asc" ? 1 : -1}
+        }).then((transactions: any) => {
+            transactions = transactions.map(t => {
+                var x = t.toObject();
+                x.hash = x.id;
+                delete x.id;
+                delete x._id;
+                return x;
+            });
+            sendJSONresponse(res, 200, {"status": "1", "message": "OK", "result": transactions});
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 404, err);
         });
     };
 
