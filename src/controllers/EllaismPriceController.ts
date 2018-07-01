@@ -69,7 +69,7 @@ export class EllaismPriceController {
 
     getTransactionCount = (req: Request, res: Response) => {
         Config.web3.eth.getTransactionCount(req.query.data, req.query.tag).then(result => {
-            sendJSONresponse(res, 200, result);
+            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: '0x' + result.toString(16)});
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
