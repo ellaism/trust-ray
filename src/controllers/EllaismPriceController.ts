@@ -156,7 +156,7 @@ export class EllaismPriceController {
             gasPrice: gasPrice,
             gas: gas
         }).then(result => {
-            sendJSONresponse(res, 200, result);
+            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: result});
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
@@ -169,7 +169,7 @@ export class EllaismPriceController {
     accountBalance = (req: Request, res: Response) => {
         const address = req.query.address;
         Config.web3.eth.getBalance(address).then(result => {
-            sendJSONresponse(res, 200, {result: result});
+            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: result});
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
