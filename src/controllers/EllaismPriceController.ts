@@ -57,7 +57,7 @@ export class EllaismPriceController {
 
     gasPrice = (req: Request, res: Response) => {
         Config.web3.eth.gasPrice().then(result => {
-            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: result});
+            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: '0x' + result.toString(16)});
               }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
@@ -156,7 +156,7 @@ export class EllaismPriceController {
             gasPrice: gasPrice,
             gas: gas
         }).then(result => {
-            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: result});
+            sendJSONresponse(res, 200, {jsonrpc: "2.0", id: 1, result: '0x' + result.toString(16)});
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
