@@ -1,0 +1,215 @@
+import { Request, Response } from "express";
+import { sendJSONresponse } from "../common/Utils";
+import { Token } from "../models/TokenModel";
+import { ERC20Contract } from "../models/Erc20ContractModel";
+import * as xss from "xss-filters";
+import { TokenParser } from "../common/TokenParser";
+import {TokenController} from "./TokenController";
+const config = require("config");
+
+export class EllaismTokenController {
+    private getTokenBalance: any
+
+    constructor() {
+        this.getTokenBalance = new TokenParser().getTokenBalance
+    }
+
+    public readAllTokens = async (req: Request, res: Response) => {
+        const validationErrors: any = EllaismTokenController.validateQueryParameters(req)
+
+        if (validationErrors) return sendJSONresponse(res, 400, validationErrors)
+
+        const queryParams = this.extractQueryParameters(req)
+        const address = queryParams.address.toLowerCase()
+        const showBalance = queryParams.showBalance === "true"
+
+        const tokens = await this.getTokensByAddress(address, showBalance)
+
+        sendJSONresponse(res, 200, {docs: tokens})
+    }
+
+    getAddressInfo = async (req: Request, res: Response) => {
+        const address = req.params.address.toLowerCase()
+
+        const tokens = await this.getTokensByAddress(address, true)
+
+        const lunary_tokens = tokens.map( (token : any) => {
+            return { "tokenInfo": {
+                    "name": token.contract.name,
+                    "symbol": token.contract.symbol,
+                    "decimals": token.contract.decimals,
+                    "price": {"rate": 0},
+                    "address": token.contract.address,
+                    "totalSupply": 0,
+                    "holdersCount": 0
+                },
+            "balance": token.balance};
+        });
+
+        sendJSONresponse(res, 200, {"address": address, "tokens": lunary_tokens});
+    };
+
+
+    private async getTokensByAddress(address: string, showBalance: boolean) {
+        const tokens = await Token.findOne({_id: address}).populate({path: "tokens", match: {enabled: true}})
+
+        if (tokens) {
+            const tokensBalancePromise = tokens.tokens.map(async (token: any) => {
+                let balance: string = "0"
+                const tokenAddress = token.address
+                balance = await this.getTokenBalance(address, tokenAddress)
+
+                if (balance === "0") {
+                    await Token.findOneAndUpdate({_id: address}, {$pull: {tokens: token._id}})
+                }
+
+                return {
+                    balance,
+                    contract: {
+                        contract: tokenAddress,
+                        address: tokenAddress,
+                        name: token.name,
+                        decimals: token.decimals,
+                        symbol: token.symbol
+                    }
+                }
+            })
+
+            return Promise.all(tokensBalancePromise).then((tokens) => tokens.filter((token: any) => token.balance !== "0"))
+        } else {
+            return Promise.resolve([])
+        }
+    }
+
+    public readOneToken(req: Request, res: Response) {
+        if (!req.params || !req.params.address) {
+            sendJSONresponse(res, 404, { "message": "No address in request" });
+            return;
+        }
+        // validate wallet address
+        req.checkParams("address", "wallet address must be alphanumeric").isAlphanumeric();
+        const validationErrors = req.validationErrors();
+        if (validationErrors) {
+            sendJSONresponse(res, 400, validationErrors);
+            return;
+        }
+
+        const address = xss.inHTMLData(req.params.address);
+
+        Token.find({_id: address}).populate({path: "tokens", select: "-_id"}).then((token: any) => {
+            if (!token) {
+                sendJSONresponse(res, 404, {"message": "wallet address not found"});
+                return;
+            }
+            sendJSONresponse(res, 200, {
+                address: token[0]._id,
+                tokens: token[0].tokens
+            });
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 404, err);
+        });
+    }
+
+    public readTokenInfo(req: Request, res: Response) {
+        if (!req.params || !req.params.tokenAddress) {
+            sendJSONresponse(res, 404, { "message": "No token address in request" });
+            return;
+        }
+
+        req.checkParams("tokenAddress", "wallet address must be alphanumeric").isAlphanumeric();
+        const validationErrors = req.validationErrors();
+        if (validationErrors) {
+            sendJSONresponse(res, 400, validationErrors);
+            return;
+        }
+
+        const address = xss.inHTMLData(req.params.tokenAddress);
+
+        ERC20Contract.findOne({address}).then((erc20: any) => {
+            sendJSONresponse(res, 200, erc20);
+        }).catch((error: Error) => {
+            sendJSONresponse(res, 404, error);
+        })
+    }
+
+    public listTokens(req: Request, res: Response) {
+        const term = req.query.query;
+        if (!term) {
+            sendJSONresponse(res, 404, {"message": "need query"})
+            return;
+        }
+        const re = new RegExp(term, "i");
+        ERC20Contract.find({
+            $and: [
+                {$or: [
+                        { "name": { $regex: re }},
+                        { "symbol": { $regex: re }},
+                        { "address": { $regex: re }}
+                    ]},
+                {enabled: true},
+            ]
+        }).limit(20).sort({verified: -1}).exec().then((contracts: any) => {
+            sendJSONresponse(res, 200, contracts);
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 404, err);
+        });
+    }
+
+    public listTokensNew = (req: Request, res: Response) => {
+        const term = req.query.query;
+        if (!term) {
+            sendJSONresponse(res, 404, {"message": "need query"})
+            return;
+        }
+        const queryParams = this.extractQueryParameters(req);
+        const re = new RegExp(term, "i");
+        const query = ERC20Contract.find().or([
+            { "name": { $regex: re }},
+            { "symbol": { $regex: re }},
+            { "address": { $regex: re }}
+        ])
+        ERC20Contract.paginate(query, {
+            page: queryParams.page,
+            limit: queryParams.limit,
+        }).then((contracts: any) => {
+            sendJSONresponse(res, 200, contracts);
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 404, err);
+        });
+    }
+
+    private static validateQueryParameters(req: Request) {
+        req.checkQuery("page", "Page needs to be a number").optional().isNumeric();
+        req.checkQuery("limit", "limit needs to be a number").optional().isNumeric();
+        req.checkQuery("address", "address needs to be alphanumeric").isAlphanumeric().isLength({min: 42, max: 42});
+        req.checkQuery("showBalance", "showBalance needs to be a boolean").optional().isBoolean();
+
+        return req.validationErrors();
+    }
+
+    private extractQueryParameters(req: Request) {
+        let page = parseInt(xss.inHTMLData(req.query.page));
+        if (isNaN(page) || page < 1) {
+            page = 1;
+        }
+
+        let limit = parseInt(xss.inHTMLData(req.query.limit));
+        if (isNaN(limit)) {
+            limit = 50;
+        } else if (limit > 500) {
+            limit = 500;
+        } else if (limit < 1) {
+            limit = 1;
+        }
+
+        const address = xss.inHTMLData(req.query.address);
+        const showBalance = req.query.showBalance;
+
+        return {
+            address,
+            page,
+            limit,
+            showBalance
+        };
+    }
+}

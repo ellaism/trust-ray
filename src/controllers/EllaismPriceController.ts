@@ -64,7 +64,7 @@ export class EllaismPriceController {
                 status: 500,
                 error: error.toString(),
             });
-        });;
+        });
     };
 
     getTransactionCount = (req: Request, res: Response) => {
