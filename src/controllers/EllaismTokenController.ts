@@ -40,8 +40,8 @@ export class EllaismTokenController {
                     "decimals": token.contract.decimals,
                     "price": {"rate": 0},
                     "address": token.contract.address,
-                    "totalSupply": 0,
-                    "holdersCount": 0
+                    "totalSupply": token.contract.totalSupply,
+                    "holdersCount": token.contract.holdersCount
                 },
             "balance": token.balance};
         });
@@ -70,7 +70,9 @@ export class EllaismTokenController {
                         address: tokenAddress,
                         name: token.name,
                         decimals: token.decimals,
-                        symbol: token.symbol
+                        symbol: token.symbol,
+                        totalSupply: token.totalSupply,
+                        holdersCount: token.holdersCount
                     }
                 }
             })

@@ -33,6 +33,10 @@ const ERC20ContractScheme = new Schema({
         type: Boolean,
         default: true,
         index: true
+    },
+    holdersCount: {
+        type: String,
+        required: true
     }
 }, {
     versionKey: false,
