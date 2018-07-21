@@ -31,6 +31,8 @@ router.get("/tokens/list/new", ellaismTokenController.listTokensNew);
 router.get("/tokens/:address", ellaismTokenController.readOneToken);
 router.get("/tokenInfo/:tokenAddress", ellaismTokenController.readTokenInfo);
 
+router.get("/explorer_tokens", ellaismTokenController.explorerTokens);
+
 // URLs for push notifications
 router.post("/push/register", pusherController.register);
 router.delete("/push/unregister", pusherController.unregister);

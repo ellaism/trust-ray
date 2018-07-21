@@ -49,6 +49,25 @@ export class EllaismTokenController {
         sendJSONresponse(res, 200, {"address": address, "tokens": lunary_tokens});
     };
 
+    
+    explorerTokens = async (req: Request, res: Response) => {
+        const re = new RegExp("0", "i");
+        ERC20Contract.find({ "address": { $regex: re }}).exec().then((contracts: any) => {
+            const result = contracts.map((contract:any) => {
+                return {
+                    address: contract.address,
+                    symbol: contract.symbol,
+                    name: contract.name,
+                    decimal: contract.decimals,
+                };
+            });
+
+            sendJSONresponse(res, 200, result);
+        }).catch((err: Error) => {
+            sendJSONresponse(res, 500, err);
+        });
+    };
+
 
     private async getTokensByAddress(address: string, showBalance: boolean) {
         const tokens = await Token.findOne({_id: address}).populate({path: "tokens", match: {enabled: true}})
