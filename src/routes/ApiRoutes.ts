@@ -50,6 +50,7 @@ router.get("/returnChartData", ellaismPriceController.getHistoricalPrices);
 router.get("/currentPrice", ellaismPriceController.getCurrentPrice);
 router.get("/account_balancemulti", ellaismPriceController.accountBalanceMulti);
 router.get("/account_balance", ellaismPriceController.accountBalance);
+router.get("/raw_balance", ellaismPriceController.rawBalance);
 router.get("/estimateGas", ellaismPriceController.estimateGas);
 router.get("/gasPrice", ellaismPriceController.gasPrice);
 router.get("/getTransactionCount", ellaismPriceController.getTransactionCount);

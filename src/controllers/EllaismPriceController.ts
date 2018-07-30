@@ -179,6 +179,20 @@ export class EllaismPriceController {
         });
     };
 
+    rawBalance = (req: Request, res: Response) => {
+        const address = req.query.address;
+        Config.web3.eth.getBalance(address).then(result => {
+            res.status(200);
+            res.send(result)
+        }).catch((error: Error) => {
+            console.error(error);
+            sendJSONresponse(res, 500, {
+                status: 500,
+                error: error.toString(),
+            });
+        });
+    };
+
     accountBalanceMulti = (req: Request, res: Response) => {
         const address_param = req.query.address;
         const addresses = address_param.split(',');
