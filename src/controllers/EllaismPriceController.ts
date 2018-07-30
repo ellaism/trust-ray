@@ -1,5 +1,6 @@
 import {Request, Response} from "express";
 import {sendJSONresponse} from "../common/Utils";
+import {getValueInEth} from "../common/ValueConverter";
 import axios from "axios";
 import {Promise} from "bluebird";
 import {HistoricalPrice} from "../models/HistoricalPriceModel";
@@ -183,7 +184,7 @@ export class EllaismPriceController {
         const address = req.query.address;
         Config.web3.eth.getBalance(address).then(result => {
             res.status(200);
-            res.send(result)
+            res.send(getValueInEth(result, 18));
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
