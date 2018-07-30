@@ -184,7 +184,7 @@ export class EllaismPriceController {
         const address = req.query.address;
         Config.web3.eth.getBalance(address).then(result => {
             res.status(200);
-            res.send(getValueInEth(result, 18));
+            res.send(getValueInEth(result, 18).toNumber().toString());
         }).catch((error: Error) => {
             console.error(error);
             sendJSONresponse(res, 500, {
