@@ -63,7 +63,7 @@ export class TransactionParser {
         newTransaction.receipt = receipt;
         newTransaction.contract = receipt.contractAddress ? receipt.contractAddress.toLowerCase() : null
         if (receipt.status) {
-            newTransaction.error = receipt.status === "0x1" ? "" : "Error";
+            newTransaction.error = ((receipt.status === "0x1") || (receipt.status === true)) ? "" : "Error";
         }
         return newTransaction;
     }
