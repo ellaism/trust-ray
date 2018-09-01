@@ -33,11 +33,10 @@ export class TokenController {
         if (tokens) {
             const tokensBalancePromise = tokens.tokens.map(async (token: any) => {
                 let balance: string = "0"
-                const tokenAddress = token.address
-                balance = await this.getTokenBalance(address, tokenAddress)
+                const tokenAddress: string = token.address
 
-                if (balance === "0") {
-                    await Token.findOneAndUpdate({_id: address}, {$pull: {tokens: token._id}})
+                if (showBalance) {
+                    balance = await this.getTokenBalance(address, tokenAddress)
                 }
 
                 return {
@@ -52,7 +51,7 @@ export class TokenController {
                 }
             })
 
-            return Promise.all(tokensBalancePromise).then((tokens) => tokens.filter((token: any) => token.balance !== "0"))
+            return Promise.all(tokensBalancePromise).then((tokens) => tokens)
         } else {
             return Promise.resolve([])
         }
