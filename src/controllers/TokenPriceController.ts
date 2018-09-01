@@ -15,7 +15,7 @@ export class TokenPriceController {
     private lastUpdated: any = {};
     private latestPrices: any = {};
     private isUpdating: any = {};
-    private githubImageURL: string = "https://raw.githubusercontent.com/TrustWallet/tokens/master/images/";
+    private githubImageURL: string = "https://raw.githubusercontent.com/ellaism/tokens/master/images/";
 
     getTokenPrices = (req: Request, res: Response) => {
         const currency = req.body.currency || "USD";
@@ -36,7 +36,7 @@ export class TokenPriceController {
 
     private filterTokenPrices(prices: any[], tokens: IToken[], currency: string): any {
         const altContract = "0x0000000000000000000000000000000000000000"; // ETH, EHC, POA, CLO
-        const pricesCoinmarket = (<any>Object).values(prices[0]['data']);
+        const pricesCoinmarket = (<any>Object).values(prices[0]);
         const pricesMap: IPrice[] = pricesCoinmarket.reduce((map: any, obj: any) => {
             map[obj.symbol.toLowerCase()] = obj;
             return map;
