@@ -36,7 +36,7 @@ export class TokenPriceController {
 
     private filterTokenPrices(prices: any[], tokens: IToken[], currency: string): any {
         const altContract = "0x0000000000000000000000000000000000000000"; // ETH, EHC, POA, CLO
-        const pricesCoinmarket = (<any>Object).values(prices[0]);
+        const pricesCoinmarket = (<any>Object).values(prices[0]['data']);
         const pricesMap: IPrice[] = pricesCoinmarket.reduce((map: any, obj: any) => {
             map[obj.symbol.toLowerCase()] = obj;
             return map;
