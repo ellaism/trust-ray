@@ -49,7 +49,7 @@ export interface ISavedTransaction {
     operations: any[], // TODO add IOperation
     receipt: ITransactionReceipt,
     success: any
-    timeStamp: string,
+    timeStamp: number,
     to: string,
     value: string,
 }

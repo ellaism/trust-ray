@@ -76,7 +76,7 @@ export class TransactionParser {
         return {
             _id: String(transaction.hash),
             blockNumber: Number(transaction.blockNumber),
-            timeStamp: String(block.timestamp),
+            timeStamp: Number(block.timestamp),
             nonce: Number(transaction.nonce),
             from,
             to,

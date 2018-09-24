@@ -19,7 +19,7 @@ const transactionSchema = new Schema({
         index: true
     },
     timeStamp: {
-        type: String,
+        type: Number,
         required: true,
         index: true
     },
