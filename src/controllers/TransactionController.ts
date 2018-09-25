@@ -54,6 +54,15 @@ export class TransactionController {
                 }
             }
         }).then((transactions: any) => {
+            let stringTimestamps = [];
+            if (Array.isArray(transactions.docs)) {
+                transactions.docs.forEach(transaction => {
+                    let stringVersion = transaction.toObject();
+                    stringVersion.timeStamp = '' + stringVersion.timeStamp;
+                    stringTimestamps.push(stringVersion)
+                });
+                transactions.docs = stringTimestamps
+            }
             sendJSONresponse(res, 200, transactions);
         }).catch((err: Error) => {
             sendJSONresponse(res, 404, err);
