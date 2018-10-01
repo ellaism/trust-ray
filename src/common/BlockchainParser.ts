@@ -17,10 +17,10 @@ export class BlockchainParser {
 
     private transactionParser: TransactionParser;
     private tokenParser: TokenParser;
-    private maxConcurrentBlocks: number = parseInt(config.get("PARSER.MAX_CONCURRENT_BLOCKS")) || 2;
+    private maxConcurrentBlocks: number = parseInt(config.get("PARSER.MAX_CONCURRENT_BLOCKS")) || 10;
     private rebalanceOffsets: number[] = [15];
     private forwardParsedDelay: number = parseInt(config.get("PARSER.DELAYS.FORWARD")) || 100;
-    private backwardParsedDelay: number = parseInt(config.get("PARSER.DELAYS.BACKWARD")) || 300;
+    private backwardParsedDelay: number = parseInt(config.get("PARSER.DELAYS.BACKWARD")) || 100;
 
     constructor() {
         this.transactionParser = new TransactionParser();
